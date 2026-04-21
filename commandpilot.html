@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommandPilot — AI Business Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --bg2: #0e0e1a;
+  --surface: #12121f;
+  --surface2: #1a1a2e;
+  --surface3: #222238;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --border3: rgba(255,255,255,0.16);
+  --text: #e8e8f0;
+  --text2: #9898b0;
+  --text3: #5a5a78;
+  --accent: #7c6dfa;
+  --accent2: #a593ff;
+  --accent-glow: rgba(124,109,250,0.2);
+  --green: #00d97e;
+  --green-dim: rgba(0,217,126,0.12);
+  --red: #ff5c7a;
+  --red-dim: rgba(255,92,122,0.1);
+  --amber: #ffb547;
+  --amber-dim: rgba(255,181,71,0.1);
+  --blue: #47b4ff;
+  --blue-dim: rgba(71,180,255,0.1);
+  --pink: #ff6eb4;
+  --pink-dim: rgba(255,110,180,0.1);
+  --teal: #00d4d4;
+  --teal-dim: rgba(0,212,212,0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Ambient background */
+body::before {
+  content: '';
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(ellipse, rgba(124,109,250,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -10%;
+  right: -10%;
+  width: 40%;
+  height: 40%;
+  background: radial-gradient(ellipse, rgba(0,217,126,0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 1.5rem 1.25rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.logo-icon {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-name {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.logo-tagline {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.02em;
+  padding-left: 44px;
+}
+
+.sidebar-section {
+  padding: 1.25rem 1rem 0.5rem;
+}
+
+.sidebar-section-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 0 0.25rem;
+  margin-bottom: 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  font-size: 13.5px;
+  color: var(--text2);
+  font-weight: 400;
+  border: 1px solid transparent;
+}
+
+.nav-item:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.nav-item.active {
+  background: var(--accent-glow);
+  border-color: rgba(124,109,250,0.2);
+  color: var(--accent2);
+  font-weight: 500;
+}
+
+.nav-icon {
+  font-size: 15px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.nav-badge {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--surface3);
+  color: var(--text3);
+  letter-spacing: 0.04em;
+}
+
+.nav-item.active .nav-badge {
+  background: rgba(124,109,250,0.2);
+  color: var(--accent2);
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.version-tag {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* MAIN CONTENT */
+.main {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(8,8,16,0.8);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.topbar-desc {
+  font-size: 12px;
+  color: var(--text3);
+  margin-left: 4px;
+}
+
+.topbar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  margin-left: auto;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.content {
+  padding: 2rem;
+  flex: 1;
+  max-width: 760px;
+}
+
+/* TOOL PANELS */
+.tool-panel { display: none; }
+.tool-panel.active {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tool-header {
+  margin-bottom: 1.5rem;
+}
+
+.tool-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+.tool-subtitle {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+/* Form elements */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+}
+
+.field input,
+.field select,
+.field textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 9px;
+  padding: 10px 13px;
+  font-size: 13.5px;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--text3);
+  font-size: 13px;
+}
+
+.field select option { background: #1a1a2e; }
+
+.field textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.6;
+}
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+/* Checkboxes */
+.check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+.check-item:hover { border-color: var(--border2); color: var(--text); }
+.check-item input { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
+
+/* Tone pills */
+.tone-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.tone-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+.tone-pill:hover { color: var(--text); border-color: var(--border3); }
+.tone-pill.selected {
+  background: var(--accent-glow);
+  border-color: rgba(124,109,250,0.35);
+  color: var(--accent2);
+}
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--accent) 0%, #9b8cff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: 0.01em;
+}
+.submit-btn:hover { opacity: 0.9; }
+.submit-btn:active { transform: scale(0.99); }
+.submit-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+/* Loading */
+.loading-box {
+  display: none;
+  text-align: center;
+  padding: 2.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-top: 1rem;
+}
+.loading-box.show { display: block; animation: fadeIn 0.2s ease; }
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 13px; color: var(--text3); }
+
+/* Result */
+.result-box {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-top: 1rem;
+  overflow: hidden;
+}
+.result-box.show { display: block; animation: fadeIn 0.3s ease; }
+
+.result-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.result-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent2);
+}
+
+.result-actions { display: flex; gap: 8px; }
+
+.action-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.15s;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+}
+.action-btn:hover { background: var(--surface3); color: var(--text); }
+.action-btn.primary {
+  background: var(--accent-glow);
+  border-color: rgba(124,109,250,0.3);
+  color: var(--accent2);
+}
+
+.result-body { padding: 1.25rem 1.5rem; }
+.result-text {
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Stats bar */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 1.25rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent2);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.02em;
+}
+.stat-label { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+/* Section results (for analyzer) */
+.section-result {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 10px;
+}
+.section-result-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.section-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.section-body {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+/* Follow-up items */
+.followup-list { display: flex; flex-direction: column; gap: 10px; padding: 1.25rem; }
+.followup-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.125rem;
+}
+.followup-day {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.followup-msg {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* Error */
+.error-msg {
+  display: none;
+  background: var(--red-dim);
+  border: 1px solid rgba(255,92,122,0.2);
+  border-radius: 9px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: var(--red);
+  margin-top: 10px;
+}
+.error-msg.show { display: block; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .content { padding: 1.25rem; }
+  .row, .row-3 { grid-template-columns: 1fr; }
+  .stats-bar { grid-template-columns: 1fr; }
+  .check-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <div class="logo-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 1L11.5 6.5L17 7.5L13 11.5L14 17L9 14.5L4 17L5 11.5L1 7.5L6.5 6.5L9 1Z" fill="white"/>
+          </svg>
+        </div>
+        <span class="logo-name">CommandPilot</span>
+      </div>
+      <div class="logo-tagline">AI Business Suite</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Financial</div>
+      <div class="nav-item active" onclick="switchTool(0)">
+        <span class="nav-icon">📊</span>
+        Business Analyzer
+        <span class="nav-badge">AI</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Marketing</div>
+      <div class="nav-item" onclick="switchTool(1)">
+        <span class="nav-icon">📣</span>
+        Marketing Analyzer
+        <span class="nav-badge">AI</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Client Communication</div>
+      <div class="nav-item" onclick="switchTool(2)">
+        <span class="nav-icon">💬</span>
+        Smart Reply
+      </div>
+      <div class="nav-item" onclick="switchTool(3)">
+        <span class="nav-icon">📋</span>
+        Proposal Writer
+      </div>
+      <div class="nav-item" onclick="switchTool(4)">
+        <span class="nav-icon">🔁</span>
+        Follow-up Sequence
+      </div>
+      <div class="nav-item" onclick="switchTool(5)">
+        <span class="nav-icon">😤</span>
+        Complaint Handler
+      </div>
+      <div class="nav-item" onclick="switchTool(6)">
+        <span class="nav-icon">⭐</span>
+        Review Requester
+      </div>
+      <div class="nav-item" onclick="switchTool(7)">
+        <span class="nav-icon">💰</span>
+        Invoice Chaser
+      </div>
+      <div class="nav-item" onclick="switchTool(8)">
+        <span class="nav-icon">📄</span>
+        Weekly Report
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="version-tag">v1.0.0 · 9 tools</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <span class="topbar-title" id="topbar-title">Business Analyzer</span>
+        <span class="topbar-desc" id="topbar-desc">· Financial insights</span>
+      </div>
+      <div class="topbar-dot"></div>
+    </div>
+
+    <div class="content">
+
+      <!-- ======================== -->
+      <!-- TOOL 0: BUSINESS ANALYZER -->
+      <!-- ======================== -->
+      <div class="tool-panel active" id="panel-0">
+        <div class="tool-header">
+          <div class="tool-title">📊 Business Analyzer</div>
+          <div class="tool-subtitle">Enter your numbers and get clear insights on where you're losing money and how to grow.</div>
+        </div>
+        <div class="form-card">
+          <div class="form-section-label">Revenue & Customers</div>
+          <div class="row">
+            <div class="field"><label>Monthly revenue ($)</label><input type="number" id="biz-revenue" placeholder="e.g. 15000"></div>
+            <div class="field"><label>Monthly expenses ($)</label><input type="number" id="biz-expenses" placeholder="e.g. 9000"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>New leads per month</label><input type="number" id="biz-leads" placeholder="e.g. 80"></div>
+            <div class="field"><label>Paying customers</label><input type="number" id="biz-customers" placeholder="e.g. 20"></div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Industry</label>
+              <select id="biz-industry">
+                <option value="">Select industry</option>
+                <option>Restaurant / food service</option>
+                <option>Retail store</option>
+                <option>Service business</option>
+                <option>Freelance / consulting</option>
+                <option>E-commerce</option>
+                <option>Health / wellness</option>
+                <option>Construction / trades</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field"><label>Biggest challenge (optional)</label><input type="text" id="biz-challenge" placeholder="e.g. not enough customers"></div>
+          </div>
+          <div class="form-section-label" style="margin-top:14px">Where you spend money</div>
+          <div class="check-grid">
+            <label class="check-item"><input type="checkbox" value="advertising"> Advertising</label>
+            <label class="check-item"><input type="checkbox" value="employees"> Employees</label>
+            <label class="check-item"><input type="checkbox" value="software"> Software / tools</label>
+            <label class="check-item"><input type="checkbox" value="rent"> Rent</label>
+            <label class="check-item"><input type="checkbox" value="inventory"> Inventory</label>
+            <label class="check-item"><input type="checkbox" value="contractors"> Contractors</label>
+          </div>
+          <div style="margin-top:14px">
+            <button class="submit-btn" onclick="runBizAnalysis()">Analyze My Business →</button>
+          </div>
+          <div class="error-msg" id="biz-error"></div>
+        </div>
+        <div class="loading-box" id="biz-loading"><div class="spinner"></div><div class="loading-text">Analyzing your numbers...</div></div>
+        <div id="biz-results" style="display:none">
+          <div class="stats-bar" id="biz-stats"></div>
+          <div class="section-result" style="border-left:3px solid var(--red)">
+            <div class="section-result-header">
+              <div class="section-icon" style="background:var(--red-dim)">💸</div>
+              <div class="section-title">Money Leaks</div>
+            </div>
+            <div class="section-body" id="biz-leaks"></div>
+          </div>
+          <div class="section-result" style="border-left:3px solid var(--green)">
+            <div class="section-result-header">
+              <div class="section-icon" style="background:var(--green-dim)">⚡</div>
+              <div class="section-title">Quick Wins This Week</div>
+            </div>
+            <div class="section-body" id="biz-wins"></div>
+          </div>
+          <div class="section-result" style="border-left:3px solid var(--blue)">
+            <div class="section-result-header">
+              <div class="section-icon" style="background:var(--blue-dim)">📋</div>
+              <div class="section-title">30-Day Action Plan</div>
+            </div>
+            <div class="section-body" id="biz-plan"></div>
+          </div>
+          <div class="section-result" style="border-left:3px solid var(--amber)">
+            <div class="section-result-header">
+              <div class="section-icon" style="background:var(--amber-dim)">🚀</div>
+              <div class="section-title">Growth Opportunity</div>
+            </div>
+            <div class="section-body" id="biz-growth"></div>
+          </div>
+          <div style="text-align:center;margin-top:1rem">
+            <button class="action-btn" onclick="resetTool('biz')">← Analyze Another Business</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================== -->
+      <!-- TOOL 1: MARKETING ANALYZER -->
+      <!-- ======================== -->
+      <div class="tool-panel" id="panel-1">
+        <div class="tool-header">
+          <div class="tool-title">📣 Marketing Analyzer</div>
+          <div class="tool-subtitle">Get a complete marketing strategy including the hottest ad tactics working right now.</div>
+        </div>
+        <div class="form-card">
+          <div class="row">
+            <div class="field"><label>Monthly marketing budget ($)</label><input type="number" id="mkt-budget" placeholder="e.g. 1500"></div>
+            <div class="field"><label>Monthly revenue ($)</label><input type="number" id="mkt-revenue" placeholder="e.g. 15000"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>New customers per month</label><input type="number" id="mkt-customers" placeholder="e.g. 20"></div>
+            <div class="field">
+              <label>Industry</label>
+              <select id="mkt-industry">
+                <option value="">Select industry</option>
+                <option>Restaurant / food service</option>
+                <option>Retail store</option>
+                <option>Service business</option>
+                <option>Freelance / consulting</option>
+                <option>E-commerce</option>
+                <option>Health / wellness</option>
+                <option>Construction / trades</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-section-label" style="margin-top:14px">Current channels</div>
+          <div class="check-grid">
+            <label class="check-item"><input type="checkbox" value="Facebook ads"> Facebook ads</label>
+            <label class="check-item"><input type="checkbox" value="Google ads"> Google ads</label>
+            <label class="check-item"><input type="checkbox" value="Instagram"> Instagram</label>
+            <label class="check-item"><input type="checkbox" value="TikTok"> TikTok</label>
+            <label class="check-item"><input type="checkbox" value="word of mouth"> Word of mouth</label>
+            <label class="check-item"><input type="checkbox" value="email marketing"> Email marketing</label>
+          </div>
+          <div class="field" style="margin-top:14px"><label>Target customer</label><input type="text" id="mkt-target" placeholder="e.g. homeowners aged 35-55 in suburban areas"></div>
+          <div class="field"><label>Biggest marketing challenge</label><input type="text" id="mkt-challenge" placeholder="e.g. getting seen online, converting leads..."></div>
+          <button class="submit-btn" onclick="runMktAnalysis()" style="margin-top:4px">Analyze My Marketing →</button>
+          <div class="error-msg" id="mkt-error"></div>
+        </div>
+        <div class="loading-box" id="mkt-loading"><div class="spinner"></div><div class="loading-text">Building your marketing strategy...</div></div>
+        <div id="mkt-results" style="display:none">
+          <div class="stats-bar" id="mkt-stats"></div>
+          <div class="section-result" style="border-left:3px solid var(--red)">
+            <div class="section-result-header"><div class="section-icon" style="background:var(--red-dim)">💸</div><div class="section-title">Marketing Money Leaks</div></div>
+            <div class="section-body" id="mkt-leaks"></div>
+          </div>
+          <div class="section-result" style="border-left:3px solid var(--green)">
+            <div class="section-result-header"><div class="section-icon" style="background:var(--green-dim)">📡</div><div class="section-title">Best Channels For You</div></div>
+            <div class="section-body" id="mkt-channels"></div>
+          </div>
+          <div class="section-result" style="border-left:3px solid var(--amber)">
+            <div class="section-result-header"><div class="section-icon" style="background:var(--amber-dim)">🔥</div><div class="section-title">Hottest Ad Strategies Right Now</div></div>
+            <div class="section-body" id="mkt-ads"></div>
+          </div>
+          <div class="section-result" style="border-left:3px solid var(--pink)">
+            <div class="section-result-header"><div class="section-icon" style="background:var(--pink-dim)">✍️</div><div class="section-title">Content & Social Plan</div></div>
+            <div class="section-body" id="mkt-content"></div>
+          </div>
+          <div class="section-result" style="border-left:3px solid var(--blue)">
+            <div class="section-result-header"><div class="section-icon" style="background:var(--blue-dim)">📋</div><div class="section-title">30-Day Marketing Plan</div></div>
+            <div class="section-body" id="mkt-plan"></div>
+          </div>
+          <div style="text-align:center;margin-top:1rem">
+            <button class="action-btn" onclick="resetTool('mkt')">← Analyze Another Business</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================== -->
+      <!-- TOOL 2: SMART REPLY -->
+      <!-- ======================== -->
+      <div class="tool-panel" id="panel-2">
+        <div class="tool-header">
+          <div class="tool-title">💬 Smart Reply</div>
+          <div class="tool-subtitle">Paste any customer message and get the perfect response in seconds.</div>
+        </div>
+        <div class="form-card">
+          <div class="field"><label>Customer message</label><textarea id="reply-msg" placeholder="Paste the customer message here — quote request, complaint, question, anything..."></textarea></div>
+          <div class="row">
+            <div class="field"><label>Your business type</label><input type="text" id="reply-biz" placeholder="e.g. roofing contractor"></div>
+            <div class="field">
+              <label>Tone</label>
+              <div class="tone-row" style="margin-top:4px">
+                <div class="tone-pill selected" onclick="selectTone(this)">Professional</div>
+                <div class="tone-pill" onclick="selectTone(this)">Friendly</div>
+                <div class="tone-pill" onclick="selectTone(this)">Direct</div>
+              </div>
+            </div>
+          </div>
+          <button class="submit-btn" onclick="runTool('reply')" style="margin-top:4px">Generate Reply →</button>
+          <div class="error-msg" id="reply-error"></div>
+        </div>
+        <div class="loading-box" id="reply-loading"><div class="spinner"></div><div class="loading-text">Writing your reply...</div></div>
+        <div class="result-box" id="reply-result">
+          <div class="result-topbar">
+            <span class="result-label">Your Reply</span>
+            <div class="result-actions">
+              <button class="action-btn" onclick="runTool('reply')">🔁 Regenerate</button>
+              <button class="action-btn primary" onclick="copyText('reply-text')">📋 Copy</button>
+            </div>
+          </div>
+          <div class="result-body"><div class="result-text" id="reply-text"></div></div>
+        </div>
+      </div>
+
+      <!-- ======================== -->
+      <!-- TOOL 3: PROPOSAL WRITER -->
+      <!-- ======================== -->
+      <div class="tool-panel" id="panel-3">
+        <div class="tool-header">
+          <div class="tool-title">📋 Proposal Writer</div>
+          <div class="tool-subtitle">Enter job details and get a full professional proposal ready to send in seconds.</div>
+        </div>
+        <div class="form-card">
+          <div class="row">
+            <div class="field"><label>Client name</label><input type="text" id="prop-client" placeholder="e.g. John Smith"></div>
+            <div class="field"><label>Your business name</label><input type="text" id="prop-biz" placeholder="e.g. Smith Construction"></div>
+          </div>
+          <div class="field"><label>Job description</label><textarea id="prop-job" placeholder="Describe the job in detail — what needs to be done, where, any special requirements..."></textarea></div>
+          <div class="row">
+            <div class="field"><label>Your price ($)</label><input type="number" id="prop-price" placeholder="e.g. 4500"></div>
+            <div class="field"><label>Timeline</label><input type="text" id="prop-timeline" placeholder="e.g. 3-5 business days"></div>
+          </div>
+          <div class="field"><label>What makes you stand out?</label><input type="text" id="prop-edge" placeholder="e.g. licensed & insured, 15 years experience, 5-year warranty"></div>
+          <button class="submit-btn" onclick="runTool('prop')" style="margin-top:4px">Generate Proposal →</button>
+          <div class="error-msg" id="prop-error"></div>
+        </div>
+        <div class="loading-box" id="prop-loading"><div class="spinner"></div><div class="loading-text">Writing your proposal...</div></div>
+        <div class="result-box" id="prop-result">
+          <div class="result-topbar">
+            <span class="result-label">Your Proposal</span>
+            <div class="result-actions">
+              <button class="action-btn" onclick="runTool('prop')">🔁 Regenerate</button>
+              <button class="action-btn primary" onclick="copyText('prop-text')">📋 Copy</button>
+            </div>
+          </div>
+          <div class="result-body"><div class="result-text" id="prop-text"></div></div>
+        </div>
+      </div>
+
+      <!-- ======================== -->
+      <!-- TOOL 4: FOLLOW-UP -->
+      <!-- ======================== -->
+      <div class="tool-panel" id="panel-4">
+        <div class="tool-header">
+          <div class="tool-title">🔁 Follow-up Sequence</div>
+          <div class="tool-subtitle">Get 5 perfectly timed follow-up messages to close any lead over 30 days.</div>
+        </div>
+        <div class="form-card">
+          <div class="row">
+            <div class="field"><label>Lead's name</label><input type="text" id="fu-name" placeholder="e.g. Mike Johnson"></div>
+            <div class="field"><label>What they inquired about</label><input type="text" id="fu-inquiry" placeholder="e.g. kitchen renovation quote"></div>
+          </div>
+          <div class="field"><label>Last interaction</label><textarea id="fu-last" style="min-height:70px" placeholder="What happened last? e.g. sent them a quote last Tuesday, they said they'd think about it..."></textarea></div>
+          <div class="field"><label>Your business type</label><input type="text" id="fu-biz" placeholder="e.g. roofing contractor"></div>
+          <button class="submit-btn" onclick="runTool('fu')" style="margin-top:4px">Generate 5-Message Sequence →</button>
+          <div class="error-msg" id="fu-error"></div>
+        </div>
+        <div class="loading-box" id="fu-loading"><div class="spinner"></div><div class="loading-text">Writing your follow-up sequence...</div></div>
+        <div class="result-box" id="fu-result">
+          <div class="result-topbar">
+            <span class="result-label">Your 5-Message Sequence</span>
+            <div class="result-actions">
+              <button class="action-btn" onclick="runTool('fu')">🔁 Regenerate</button>
+              <button class="action-btn primary" onclick="copyText('fu-list')">📋 Copy All</button>
+            </div>
+          </div>
+          <div class="followup-list" id="fu-list"></div>
+        </div>
+      </div>
+
+      <!-- ======================== -->
+      <!-- TOOL 5: COMPLAINT HANDLER -->
+      <!-- ======================== -->
+      <div class="tool-panel" id="panel-5">
+        <div class="tool-header">
+          <div class="tool-title">😤 Complaint Handler</div>
+          <div class="tool-subtitle">Turn angry customers into loyal ones with the perfect de-escalation response.</div>
+        </div>
+        <div class="form-card">
+          <div class="field"><label>Customer complaint</label><textarea id="comp-msg" placeholder="Paste the angry message, bad review, or complaint here..."></textarea></div>
+          <div class="row">
+            <div class="field"><label>Your business type</label><input type="text" id="comp-biz" placeholder="e.g. plumbing company"></div>
+            <div class="field"><label>What actually happened? (optional)</label><input type="text" id="comp-context" placeholder="e.g. job ran late due to supplier delay"></div>
+          </div>
+          <div class="field"><label>What can you offer to fix it?</label><input type="text" id="comp-offer" placeholder="e.g. partial refund, redo the work, discount on next job"></div>
+          <button class="submit-btn" onclick="runTool('comp')" style="margin-top:4px">Generate Response →</button>
+          <div class="error-msg" id="comp-error"></div>
+        </div>
+        <div class="loading-box" id="comp-loading"><div class="spinner"></div><div class="loading-text">Crafting your response...</div></div>
+        <div class="result-box" id="comp-result">
+          <div class="result-topbar">
+            <span class="result-label">Your Response</span>
+            <div class="result-actions">
+              <button class="action-btn" onclick="runTool('comp')">🔁 Regenerate</button>
+              <button class="action-btn primary" onclick="copyText('comp-text')">📋 Copy</button>
+            </div>
+          </div>
+          <div class="result-body"><div class="result-text" id="comp-text"></div></div>
+        </div>
+      </div>
+
+      <!-- ======================== -->
+      <!-- TOOL 6: REVIEW REQUESTER -->
+      <!-- ======================== -->
+      <div class="tool-panel" id="panel-6">
+        <div class="tool-header">
+          <div class="tool-title">⭐ Review Requester</div>
+          <div class="tool-subtitle">Get a personalized review request that actually gets 5-star responses.</div>
+        </div>
+        <div class="form-card">
+          <div class="row">
+            <div class="field"><label>Customer name</label><input type="text" id="rev-name" placeholder="e.g. Sarah"></div>
+            <div class="field"><label>Job completed</label><input type="text" id="rev-job" placeholder="e.g. bathroom remodel"></div>
+          </div>
+          <div class="field"><label>How did the job go?</label><input type="text" id="rev-outcome" placeholder="e.g. finished 2 days early, customer was really happy"></div>
+          <div class="row">
+            <div class="field"><label>Your business name</label><input type="text" id="rev-biz" placeholder="e.g. Johnson Plumbing"></div>
+            <div class="field">
+              <label>Send via</label>
+              <select id="rev-channel">
+                <option>Text message</option>
+                <option>Email</option>
+                <option>In person script</option>
+              </select>
+            </div>
+          </div>
+          <button class="submit-btn" onclick="runTool('rev')" style="margin-top:4px">Generate Review Request →</button>
+          <div class="error-msg" id="rev-error"></div>
+        </div>
+        <div class="loading-box" id="rev-loading"><div class="spinner"></div><div class="loading-text">Writing your review request...</div></div>
+        <div class="result-box" id="rev-result">
+          <div class="result-topbar">
+            <span class="result-label">Your Review Request</span>
+            <div class="result-actions">
+              <button class="action-btn" onclick="runTool('rev')">🔁 Regenerate</button>
+              <button class="action-btn primary" onclick="copyText('rev-text')">📋 Copy</button>
+            </div>
+          </div>
+          <div class="result-body"><div class="result-text" id="rev-text"></div></div>
+        </div>
+      </div>
+
+      <!-- ======================== -->
+      <!-- TOOL 7: INVOICE CHASER -->
+      <!-- ======================== -->
+      <div class="tool-panel" id="panel-7">
+        <div class="tool-header">
+          <div class="tool-title">💰 Invoice Chaser</div>
+          <div class="tool-subtitle">Professional payment reminders that get you paid without ruining the relationship.</div>
+        </div>
+        <div class="form-card">
+          <div class="row">
+            <div class="field"><label>Client name</label><input type="text" id="inv-client" placeholder="e.g. ABC Restaurant"></div>
+            <div class="field"><label>Amount owed ($)</label><input type="number" id="inv-amount" placeholder="e.g. 2400"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>Days overdue</label><input type="number" id="inv-days" placeholder="e.g. 14"></div>
+            <div class="field"><label>Invoice number (optional)</label><input type="text" id="inv-num" placeholder="e.g. INV-047"></div>
+          </div>
+          <div class="field"><label>What was the job?</label><input type="text" id="inv-job" placeholder="e.g. kitchen renovation completed Nov 15"></div>
+          <div class="field">
+            <label>Urgency level</label>
+            <select id="inv-urgency">
+              <option>Gentle reminder (first notice)</option>
+              <option>Firm (second notice)</option>
+              <option>Final warning (third notice)</option>
+            </select>
+          </div>
+          <button class="submit-btn" onclick="runTool('inv')" style="margin-top:4px">Generate Payment Reminder →</button>
+          <div class="error-msg" id="inv-error"></div>
+        </div>
+        <div class="loading-box" id="inv-loading"><div class="spinner"></div><div class="loading-text">Writing your payment reminder...</div></div>
+        <div class="result-box" id="inv-result">
+          <div class="result-topbar">
+            <span class="result-label">Your Payment Reminder</span>
+            <div class="result-actions">
+              <button class="action-btn" onclick="runTool('inv')">🔁 Regenerate</button>
+              <button class="action-btn primary" onclick="copyText('inv-text')">📋 Copy</button>
+            </div>
+          </div>
+          <div class="result-body"><div class="result-text" id="inv-text"></div></div>
+        </div>
+      </div>
+
+      <!-- ======================== -->
+      <!-- TOOL 8: WEEKLY REPORT -->
+      <!-- ======================== -->
+      <div class="tool-panel" id="panel-8">
+        <div class="tool-header">
+          <div class="tool-title">📄 Weekly Report</div>
+          <div class="tool-subtitle">Turn your week's activity into a professional client report in seconds.</div>
+        </div>
+        <div class="form-card">
+          <div class="row">
+            <div class="field"><label>Your business name</label><input type="text" id="rpt-biz" placeholder="e.g. Smith Construction"></div>
+            <div class="field"><label>Client name (optional)</label><input type="text" id="rpt-client" placeholder="e.g. Johnson Property Group"></div>
+          </div>
+          <div class="field"><label>What happened this week?</label><textarea id="rpt-activity" placeholder="List everything — jobs completed, problems solved, progress made, hours worked..."></textarea></div>
+          <div class="field"><label>Any issues or delays?</label><input type="text" id="rpt-issues" placeholder="e.g. waiting on tile delivery, weather delay Thursday"></div>
+          <div class="field"><label>What's planned for next week?</label><input type="text" id="rpt-next" placeholder="e.g. finishing drywall, starting electrical, final inspection"></div>
+          <button class="submit-btn" onclick="runTool('rpt')" style="margin-top:4px">Generate Weekly Report →</button>
+          <div class="error-msg" id="rpt-error"></div>
+        </div>
+        <div class="loading-box" id="rpt-loading"><div class="spinner"></div><div class="loading-text">Writing your report...</div></div>
+        <div class="result-box" id="rpt-result">
+          <div class="result-topbar">
+            <span class="result-label">Your Weekly Report</span>
+            <div class="result-actions">
+              <button class="action-btn" onclick="runTool('rpt')">🔁 Regenerate</button>
+              <button class="action-btn primary" onclick="copyText('rpt-text')">📋 Copy</button>
+            </div>
+          </div>
+          <div class="result-body"><div class="result-text" id="rpt-text"></div></div>
+        </div>
+      </div>
+
+    </div><!-- end .content -->
+  </div><!-- end .main -->
+</div><!-- end .app -->
+
+<script>
+
+const toolMeta = [
+  { title: 'Business Analyzer', desc: '· Financial insights' },
+  { title: 'Marketing Analyzer', desc: '· Marketing strategy' },
+  { title: 'Smart Reply', desc: '· Client communication' },
+  { title: 'Proposal Writer', desc: '· Client communication' },
+  { title: 'Follow-up Sequence', desc: '· Client communication' },
+  { title: 'Complaint Handler', desc: '· Client communication' },
+  { title: 'Review Requester', desc: '· Client communication' },
+  { title: 'Invoice Chaser', desc: '· Client communication' },
+  { title: 'Weekly Report', desc: '· Client communication' },
+];
+
+let currentTool = 0;
+
+function switchTool(index) {
+  document.querySelectorAll('.nav-item').forEach((n,i) => n.classList.toggle('active', i === index));
+  document.querySelectorAll('.tool-panel').forEach((p,i) => p.classList.toggle('active', i === index));
+  document.getElementById('topbar-title').textContent = toolMeta[index].title;
+  document.getElementById('topbar-desc').textContent = toolMeta[index].desc;
+  currentTool = index;
+}
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText || el.textContent).then(() => {
+    const btns = el.closest('.result-box')?.querySelectorAll('.primary') || [];
+    btns.forEach(btn => {
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+  });
+}
+
+function selectTone(el) {
+  el.closest('.tone-row').querySelectorAll('.tone-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function showLoading(id) {
+  document.getElementById(id+'-loading').classList.add('show');
+  const r = document.getElementById(id+'-result');
+  if (r) r.classList.remove('show');
+  const err = document.getElementById(id+'-error');
+  if (err) err.classList.remove('show');
+}
+function hideLoading(id) { document.getElementById(id+'-loading').classList.remove('show'); }
+function showError(id, msg) {
+  const el = document.getElementById(id+'-error');
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+function resetTool(id) {
+  const r = document.getElementById(id+'-results') || document.getElementById(id+'-result');
+  if (r) r.style.display = 'none';
+  document.querySelectorAll(`[id^="${id}-"]`).forEach(el => {
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+      if (el.type === 'checkbox') el.checked = false;
+      else el.value = '';
+    }
+  });
+}
+
+async function callAI(prompt, loadingId) {
+  showLoading(loadingId);
+  try {
+    const res = await fetch('/api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1400,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    hideLoading(loadingId);
+    if (data.error) throw new Error(data.error.message);
+    return data.content?.[0]?.text || '';
+  } catch(err) {
+    hideLoading(loadingId);
+    showError(loadingId, 'Error: ' + err.message);
+    return null;
+  }
+}
+
+function extract(text, label, next) {
+  const m = text.match(new RegExp(label + ':?\\s*([\\s\\S]*?)(?=' + next + ':|$)', 'i'));
+  return m ? m[1].trim() : '';
+}
+
+// =====================
+// BUSINESS ANALYZER
+// =====================
+async function runBizAnalysis() {
+  const revenue = document.getElementById('biz-revenue').value.trim();
+  const expenses = document.getElementById('biz-expenses').value.trim();
+  if (!revenue || !expenses) { showError('biz', 'Please enter your monthly revenue and expenses.'); return; }
+  const rev = parseFloat(revenue), exp = parseFloat(expenses);
+  const profit = rev - exp;
+  const margin = rev > 0 ? ((profit/rev)*100).toFixed(1) : 0;
+  const leads = document.getElementById('biz-leads').value;
+  const customers = document.getElementById('biz-customers').value;
+  const industry = document.getElementById('biz-industry').value;
+  const challenge = document.getElementById('biz-challenge').value;
+  const checks = Array.from(document.querySelectorAll('#panel-0 .check-item input:checked')).map(c => c.value);
+  const convRate = (leads && customers && parseFloat(leads) > 0) ? ((parseFloat(customers)/parseFloat(leads))*100).toFixed(1) : null;
+
+  document.getElementById('biz-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">$${profit.toLocaleString()}</div><div class="stat-label">Monthly profit</div></div>
+    <div class="stat-card"><div class="stat-value">${margin}%</div><div class="stat-label">Profit margin</div></div>
+    <div class="stat-card"><div class="stat-value">${convRate ? convRate+'%' : '—'}</div><div class="stat-label">Conversion rate</div></div>`;
+
+  const prompt = `You are a sharp business advisor for small businesses. Use their exact numbers. Be direct and specific.
+
+Business data:
+- Industry: ${industry || 'small business'}
+- Monthly revenue: $${rev.toLocaleString()}
+- Monthly expenses: $${exp.toLocaleString()}
+- Monthly profit: $${profit.toLocaleString()} (${margin}% margin)
+- Leads: ${leads || 'unknown'}, Customers: ${customers || 'unknown'}${convRate ? ` (${convRate}% conversion)` : ''}
+- Spending on: ${checks.join(', ') || 'not specified'}
+- Biggest challenge: ${challenge || 'not specified'}
+
+Reply in exactly this format:
+
+MONEY LEAKS:
+[2-3 specific money leaks with dollar estimates]
+
+QUICK WINS:
+[3 numbered actions to take this week]
+
+30-DAY PLAN:
+[5 numbered prioritized actions]
+
+GROWTH OPPORTUNITY:
+[One specific untapped opportunity]`;
+
+  const result = await callAI(prompt, 'biz');
+  if (result) {
+    document.getElementById('biz-leaks').textContent = extract(result, 'MONEY LEAKS', 'QUICK WINS');
+    document.getElementById('biz-wins').textContent = extract(result, 'QUICK WINS', '30-DAY PLAN');
+    document.getElementById('biz-plan').textContent = extract(result, '30-DAY PLAN', 'GROWTH OPPORTUNITY');
+    document.getElementById('biz-growth').textContent = extract(result, 'GROWTH OPPORTUNITY', 'ZZZNONE');
+    document.getElementById('biz-results').style.display = 'block';
+  }
+}
+
+// =====================
+// MARKETING ANALYZER
+// =====================
+async function runMktAnalysis() {
+  const budget = document.getElementById('mkt-budget').value.trim();
+  const revenue = document.getElementById('mkt-revenue').value.trim();
+  if (!budget && !revenue) { showError('mkt', 'Please enter your marketing budget or revenue.'); return; }
+  const bud = parseFloat(budget) || 0;
+  const rev = parseFloat(revenue) || 0;
+  const budgetPercent = rev > 0 ? ((bud/rev)*100).toFixed(1) : 0;
+  const customers = document.getElementById('mkt-customers').value;
+  const costPerCustomer = (customers && parseFloat(customers) > 0 && bud > 0) ? (bud/parseFloat(customers)).toFixed(0) : null;
+  const industry = document.getElementById('mkt-industry').value;
+  const target = document.getElementById('mkt-target').value;
+  const challenge = document.getElementById('mkt-challenge').value;
+  const channels = Array.from(document.querySelectorAll('#panel-1 .check-item input:checked')).map(c => c.value);
+
+  document.getElementById('mkt-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">$${bud.toLocaleString()}</div><div class="stat-label">Monthly budget</div></div>
+    <div class="stat-card"><div class="stat-value">${budgetPercent}%</div><div class="stat-label">Of revenue</div></div>
+    <div class="stat-card"><div class="stat-value">${costPerCustomer ? '$'+costPerCustomer : '—'}</div><div class="stat-label">Cost per customer</div></div>`;
+
+  const prompt = `You are a sharp marketing advisor for small businesses. Reference what's working in 2025. Use their numbers. Be specific.
+
+Business: ${industry || 'small business'}
+Budget: $${bud.toLocaleString()}/month (${budgetPercent}% of revenue)
+Customers/month: ${customers || 'unknown'}, Cost per customer: ${costPerCustomer ? '$'+costPerCustomer : 'unknown'}
+Current channels: ${channels.join(', ') || 'none'}
+Target customer: ${target || 'not specified'}
+Challenge: ${challenge || 'not specified'}
+
+Reply in exactly this format:
+
+MARKETING MONEY LEAKS:
+[2-3 specific marketing waste areas with dollar estimates]
+
+BEST CHANNELS:
+[Top 3 channels for their specific business in 2025 with reasons]
+
+HOTTEST AD STRATEGIES:
+[3 specific ad tactics crushing it in 2025 for their industry — be very specific about formats, hooks, targeting]
+
+CONTENT PLAN:
+[Specific weekly content plan they can actually execute]
+
+30-DAY MARKETING PLAN:
+[5 numbered prioritized actions]`;
+
+  const result = await callAI(prompt, 'mkt');
+  if (result) {
+    document.getElementById('mkt-leaks').textContent = extract(result, 'MARKETING MONEY LEAKS', 'BEST CHANNELS');
+    document.getElementById('mkt-channels').textContent = extract(result, 'BEST CHANNELS', 'HOTTEST AD STRATEGIES');
+    document.getElementById('mkt-ads').textContent = extract(result, 'HOTTEST AD STRATEGIES', 'CONTENT PLAN');
+    document.getElementById('mkt-content').textContent = extract(result, 'CONTENT PLAN', '30-DAY MARKETING PLAN');
+    document.getElementById('mkt-plan').textContent = extract(result, '30-DAY MARKETING PLAN', 'ZZZNONE');
+    document.getElementById('mkt-results').style.display = 'block';
+  }
+}
+
+// =====================
+// GENERIC TOOL RUNNER
+// =====================
+async function runTool(tool) {
+  let prompt = '';
+
+  if (tool === 'reply') {
+    const msg = document.getElementById('reply-msg').value.trim();
+    const biz = document.getElementById('reply-biz').value.trim();
+    const tone = document.querySelector('#panel-2 .tone-pill.selected')?.textContent || 'Professional';
+    if (!msg) { showError('reply', 'Please paste the customer message.'); return; }
+    prompt = `You are helping a small business owner write a ${tone.toLowerCase()} reply to a customer message.
+Business: ${biz || 'small business'}
+Customer message: "${msg}"
+Write a perfect ${tone.toLowerCase()} reply. Address all points. Sound human. Include a clear next step if appropriate. Write ONLY the reply message itself.`;
+
+  } else if (tool === 'prop') {
+    const job = document.getElementById('prop-job').value.trim();
+    if (!job) { showError('prop', 'Please describe the job.'); return; }
+    prompt = `Write a professional job proposal.
+Business: ${document.getElementById('prop-biz').value || 'our company'}
+Client: ${document.getElementById('prop-client').value || 'the client'}
+Job: ${job}
+Price: ${document.getElementById('prop-price').value ? '$'+document.getElementById('prop-price').value : 'to be discussed'}
+Timeline: ${document.getElementById('prop-timeline').value || 'to be confirmed'}
+What makes us stand out: ${document.getElementById('prop-edge').value || 'quality work'}
+Write a complete professional proposal with: opening, scope of work, timeline, investment, why choose us, next steps. Format it ready to send.`;
+
+  } else if (tool === 'fu') {
+    const name = document.getElementById('fu-name').value.trim();
+    const inquiry = document.getElementById('fu-inquiry').value.trim();
+    if (!name || !inquiry) { showError('fu', 'Please enter the lead name and inquiry.'); return; }
+    prompt = `Write a 5-message follow-up sequence for a small business owner.
+Business: ${document.getElementById('fu-biz').value || 'small business'}
+Lead: ${name}, Inquiry: ${inquiry}
+Last interaction: ${document.getElementById('fu-last').value || 'sent initial quote'}
+Format EXACTLY like this with no other text:
+DAY 3:
+[message]
+DAY 7:
+[message]
+DAY 14:
+[message]
+DAY 21:
+[message]
+DAY 30:
+[message]
+Rules: Short messages (2-4 sentences). Never desperate. Different angle each time. Human and personal.`;
+
+  } else if (tool === 'comp') {
+    const msg = document.getElementById('comp-msg').value.trim();
+    if (!msg) { showError('comp', 'Please paste the complaint.'); return; }
+    prompt = `Write a response to an angry customer complaint that saves the relationship.
+Business: ${document.getElementById('comp-biz').value || 'small business'}
+Complaint: "${msg}"
+What happened: ${document.getElementById('comp-context').value || 'not specified'}
+What we can offer: ${document.getElementById('comp-offer').value || 'we want to make it right'}
+Write a genuine response: acknowledge frustration, take appropriate responsibility, offer clear solution, end positively. Sound human. Write ONLY the response.`;
+
+  } else if (tool === 'rev') {
+    const name = document.getElementById('rev-name').value.trim();
+    const job = document.getElementById('rev-job').value.trim();
+    if (!name || !job) { showError('rev', 'Please enter customer name and job.'); return; }
+    prompt = `Write a review request message for a happy customer.
+Business: ${document.getElementById('rev-biz').value || 'our business'}
+Customer: ${name}, Job: ${job}
+How it went: ${document.getElementById('rev-outcome').value || 'customer was happy'}
+Send via: ${document.getElementById('rev-channel').value}
+Write a genuine personal review request. Reference the specific job. Ask for Google review naturally. Short and human — not spammy. Write ONLY the message.`;
+
+  } else if (tool === 'inv') {
+    const client = document.getElementById('inv-client').value.trim();
+    const amount = document.getElementById('inv-amount').value.trim();
+    if (!client || !amount) { showError('inv', 'Please enter client name and amount.'); return; }
+    prompt = `Write a payment reminder message.
+Client: ${client}, Amount: $${amount}
+Days overdue: ${document.getElementById('inv-days').value || 'several'}
+Invoice: ${document.getElementById('inv-num').value || 'not specified'}
+Job: ${document.getElementById('inv-job').value || 'services rendered'}
+Urgency: ${document.getElementById('inv-urgency').value}
+Write a professional payment reminder. State amount and job clearly. Give a payment deadline. Maintain relationship. Include subject line. Write ONLY the message.`;
+
+  } else if (tool === 'rpt') {
+    const activity = document.getElementById('rpt-activity').value.trim();
+    if (!activity) { showError('rpt', 'Please describe what happened this week.'); return; }
+    prompt = `Write a professional weekly progress report.
+Business: ${document.getElementById('rpt-biz').value || 'our company'}
+Client: ${document.getElementById('rpt-client').value || 'valued client'}
+This week: ${activity}
+Issues: ${document.getElementById('rpt-issues').value || 'none'}
+Next week: ${document.getElementById('rpt-next').value || 'to be confirmed'}
+Write a professional weekly report with clear sections. Sound like a premium service provider. Ready to copy and send.`;
+  }
+
+  const result = await callAI(prompt, tool);
+  if (!result) return;
+
+  if (tool === 'fu') {
+    const container = document.getElementById('fu-list');
+    container.innerHTML = '';
+    const parts = result.split(/(?=DAY \d+:)/g).filter(s => s.trim());
+    parts.forEach(part => {
+      const dayMatch = part.match(/DAY \d+:/);
+      const day = dayMatch ? dayMatch[0] : 'Message';
+      const msg = part.replace(/DAY \d+:/, '').trim();
+      const div = document.createElement('div');
+      div.className = 'followup-item';
+      div.innerHTML = `<div class="followup-day">${day}</div><div class="followup-msg">${msg}</div>`;
+      container.appendChild(div);
+    });
+    if (!parts.length) container.innerHTML = `<div class="result-body"><div class="result-text">${result}</div></div>`;
+  } else {
+    document.getElementById(tool+'-text').textContent = result;
+  }
+
+  document.getElementById(tool+'-result').classList.add('show');
+}
+</script>
+</body>
+</html>
